@@ -21,8 +21,7 @@
     ],
     "rules": {
         "indent": [
-            "error",
-            "tab"
+            "error"
         ],
         "quotes": [
             "error",
@@ -32,5 +31,6 @@
             "error",
             "never"
         ]
-    }
+    },
+    "ignorePatterns":["tailwind.config.js"]
 }
