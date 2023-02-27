@@ -11,14 +11,7 @@ interface DataTypeUser extends User {
 interface TableUsers<T> {
   dataUser: T[]
   handleDeleteOneUser: (key: React.Key) => void
-}
-
-// rowSelection object indicates the need for row selection
-const rowSelection = {
-  onChange: (selectedRowKeys: React.Key[], selectedRows: DataTypeUser[]) => {
-    console.log(`selectedRowKeys: ${selectedRowKeys}`, "selectedRows: ", selectedRows)
-  },
-  getCheckboxProps: (record: DataTypeUser) => ({}),
+  getUserWillBeRemove: (data: DataTypeUser[]) => void
 }
 
 const onChange = (e: CheckboxChangeEvent) => {
@@ -61,6 +54,14 @@ const TableUsers: React.FC<TableUsers<DataTypeUser>> = (props: TableUsers<DataTy
         ) : null,
     },
   ]
+
+  // rowSelection object indicates the need for row selection
+  const rowSelection = {
+    onChange: (selectedRowKeys: React.Key[], selectedRows: DataTypeUser[]) => {
+      props.getUserWillBeRemove(selectedRows)
+    },
+  }
+
   return (
     <div>
       <Table
