@@ -2,7 +2,7 @@ import React from "react"
 import {Table} from "antd"
 import type {ColumnsType} from "antd/es/table"
 import {User} from "../../utils/model"
-import {Checkbox, Popconfirm} from "antd"
+import {Popconfirm, Checkbox} from "antd"
 import type {CheckboxChangeEvent} from "antd/es/checkbox"
 interface DataTypeUser extends User {
   key: React.Key
@@ -14,8 +14,8 @@ interface TableUsers<T> {
   getUserWillBeRemove: (data: DataTypeUser[]) => void
 }
 
-const onChange = (e: CheckboxChangeEvent) => {
-  console.log(`checked = ${e.target.checked}`)
+const onChange = (e: CheckboxChangeEvent, key: React.Key) => {
+  console.log(`checked = ${e.target.checked} at ${key}`)
 }
 
 const TableUsers: React.FC<TableUsers<DataTypeUser>> = (props: TableUsers<DataTypeUser>) => {
@@ -42,6 +42,9 @@ const TableUsers: React.FC<TableUsers<DataTypeUser>> = (props: TableUsers<DataTy
     {
       title: "Active",
       dataIndex: "isActive",
+      render: (isActive: boolean, record: DataTypeUser) => (
+        <Checkbox defaultChecked={isActive} onChange={(e: CheckboxChangeEvent) => onChange(e, record.key)} />
+      ),
     },
     {
       title: "operation",

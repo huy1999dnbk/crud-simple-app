@@ -1,8 +1,9 @@
-import React, {useState, useCallback} from "react"
+import React, {useState, useMemo} from "react"
 import TableUsers from "../components/TableUsers"
 import {DUMMY_DATA} from "../utils/data"
 import {User} from "../utils/model"
 import {Button, message, Popconfirm} from "antd"
+import useDebounce from "../hook/useDebounce"
 interface DataTypeUser extends User {
   key: React.Key
 }
@@ -13,6 +14,8 @@ const DATA = DUMMY_DATA.map((user, id: number) => ({
 }))
 
 const Users: React.FC = () => {
+  const [searchInput, setSearchInput] = useState<string>("")
+  const valueSearch = useDebounce(searchInput, 200)
   const [dataUser, setData] = useState<DataTypeUser[]>(DATA)
   const [dataUserWillBeRemove, setDataUserWillBeRemove] = useState<DataTypeUser[]>([])
   const handleDeleteOneUser = (key: React.Key) => {
@@ -43,21 +46,29 @@ const Users: React.FC = () => {
     message.error("delete action is cancelled")
   }
 
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>): void => {
+    setSearchInput(e.target.value)
+  }
+
+  const dataSource = useMemo(() => {
+    return dataUser.filter((user) => user.name.toLowerCase().includes(valueSearch.toLowerCase()))
+  }, [valueSearch, dataUser])
+
   return (
     <div>
       <h1>Users list</h1>
       <div>
         <form>
           <label htmlFor="username">Search User</label>
-          <input id="username" type="text" placeholder="Search in here" />
         </form>
+        <input onChange={handleSearch} id="username" type="text" placeholder="Search in here" value={searchInput} />
         <Popconfirm title="Delete the task" description="Are you sure to delete this task?" onConfirm={confirm} onCancel={cancel} okText="Yes" cancelText="No">
           <Button type="primary" danger>
             Delete
           </Button>
         </Popconfirm>
       </div>
-      <TableUsers dataUser={dataUser} handleDeleteOneUser={handleDeleteOneUser} getUserWillBeRemove={getUserWillBeRemove} />
+      <TableUsers dataUser={dataSource} handleDeleteOneUser={handleDeleteOneUser} getUserWillBeRemove={getUserWillBeRemove} />
     </div>
   )
 }

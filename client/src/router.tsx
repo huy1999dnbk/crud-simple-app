@@ -1,7 +1,7 @@
 import React from "react"
 import {createBrowserRouter} from "react-router-dom"
-import ProtectedRoute from "./layout/ProtectedRoute"
-import NotFound from "./routes/notFound"
+import ProtectedRoute from "./layout/ProtectedRoute/ProtectedRoute"
+import NotFound from "./routes/404/notFound"
 import Users from "./routes/users"
 const router = createBrowserRouter([
   {

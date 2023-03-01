@@ -1,40 +1,40 @@
 import React, {useState} from "react"
-
+import styles from "./styles.module.css"
 import {Outlet} from "react-router-dom"
-import {MenuFoldOutlined, MenuUnfoldOutlined, UploadOutlined, UserOutlined, VideoCameraOutlined} from "@ant-design/icons"
+import {MenuFoldOutlined, MenuUnfoldOutlined, UserOutlined, VideoCameraOutlined} from "@ant-design/icons"
 import {Layout, Menu, theme} from "antd"
 
 const {Header, Sider, Content} = Layout
-
+import {useNavigate} from "react-router-dom"
 const ProtectedRoute: React.FC = () => {
   const [collapsed, setCollapsed] = useState(false)
+  const navigate = useNavigate()
+  const handleNavigateRoute = (path: string): void => {
+    navigate(path)
+  }
   const {
     token: {colorBgContainer},
   } = theme.useToken()
 
   return (
-    <Layout>
+    <Layout className={styles.layoutContainer}>
       <Sider trigger={null} collapsible collapsed={collapsed}>
         <div className="logo" />
         <Menu
           theme="dark"
           mode="inline"
-          defaultSelectedKeys={["1"]}
           items={[
             {
               key: "1",
               icon: <UserOutlined />,
-              label: "nav 1",
+              label: "Users",
+              onClick: () => handleNavigateRoute("/users"),
             },
             {
               key: "2",
               icon: <VideoCameraOutlined />,
-              label: "nav 2",
-            },
-            {
-              key: "3",
-              icon: <UploadOutlined />,
-              label: "nav 3",
+              label: "Products",
+              onClick: () => handleNavigateRoute("/products"),
             },
           ]}
         />
