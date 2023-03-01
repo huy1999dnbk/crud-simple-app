@@ -4,11 +4,11 @@ import type {ColumnsType} from "antd/es/table"
 import {User} from "../../utils/model"
 import {Popconfirm, Checkbox} from "antd"
 import type {CheckboxChangeEvent} from "antd/es/checkbox"
-interface DataTypeUser extends User {
+export interface DataTypeUser extends User {
   key: React.Key
 }
 
-interface TableUsers<T> {
+export interface TableUsers<T> {
   dataUser: T[]
   handleDeleteOneUser: (key: React.Key) => void
   getUserWillBeRemove: (data: DataTypeUser[]) => void
@@ -18,7 +18,7 @@ const onChange = (e: CheckboxChangeEvent, key: React.Key) => {
   console.log(`checked = ${e.target.checked} at ${key}`)
 }
 
-const TableUsers: React.FC<TableUsers<DataTypeUser>> = (props: TableUsers<DataTypeUser>) => {
+const TableUsersComponent: React.FC<TableUsers<DataTypeUser>> = (props: TableUsers<DataTypeUser>) => {
   const handleDetete = (key: React.Key) => {
     props.handleDeleteOneUser(key)
   }
@@ -79,4 +79,4 @@ const TableUsers: React.FC<TableUsers<DataTypeUser>> = (props: TableUsers<DataTy
   )
 }
 
-export default TableUsers
+export default TableUsersComponent
