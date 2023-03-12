@@ -12,10 +12,12 @@
     "@types/react-dom": "^18.0.11",
     "@types/react-router-dom": "^5.3.3",
     "antd": "^5.2.2",
+    "axios": "^1.3.4",
     "daisyui": "^2.50.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-paginate": "^8.1.4",
+    "react-query": "^3.39.3",
     "react-router-dom": "^6.8.1",
     "react-scripts": "5.0.1",
     "web-vitals": "^2.1.4"
@@ -48,7 +50,7 @@
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^5.53.0",
-    "@typescript-eslint/parser": "^5.53.0", 
+    "@typescript-eslint/parser": "^5.53.0",
     "eslint": "^8.34.0",
     "eslint-config-prettier": "^8.6.0",
     "eslint-plugin-prettier": "^4.2.1",

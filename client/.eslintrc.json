@@ -40,7 +40,7 @@
     "testing-library/no-node-access": [
       "off"
     ],
-    "react/jsx-no-bind": "off",
+    "react/jsx-no-bind": "error",
     "react/jsx-key": "error",
     "testing-library/prefer-presence-queries": "off",
     "prettier/prettier": [
@@ -49,7 +49,8 @@
         "endOfLine": "auto",
         "semi": false
       }
-    ]
+    ],
+    "react/display-name": "off"
   },
   "ignorePatterns": [
     "tailwind.config.js",
