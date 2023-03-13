@@ -1,5 +1,5 @@
 import React, {memo, useCallback, useMemo} from "react"
-import {Table} from "antd"
+import {Table, Button} from "antd"
 import type {ColumnsType} from "antd/es/table"
 import {IUser} from "../../utils/model"
 import {Popconfirm, Checkbox} from "antd"
@@ -13,6 +13,7 @@ export interface TableUsers<T> {
   loading: boolean
   total: number
   handleDeleteOneUser: (key: number) => void
+  handleUpdateUser: (user: IUser) => void
   getUsersWillBeRemove: (data: IUser[]) => void
 }
 
@@ -50,6 +51,17 @@ const CheckBoxUser = memo(
     return <Checkbox defaultChecked={defaultChecked} onChange={onChange} />
   }
 )
+
+const EditButton = memo(({user, handleUpdateUser}: {user: IUser; handleUpdateUser: (user: IUser) => void}) => {
+  const updateUser = useCallback(() => {
+    handleUpdateUser(user)
+  }, [])
+  return (
+    <Button type="default" onClick={updateUser}>
+      Edit
+    </Button>
+  )
+})
 
 const TableUsersComponent: React.FC<TableUsers<IUser>> = (props: TableUsers<IUser>) => {
   const {handleDeleteOneUser, getUsersWillBeRemove} = props
@@ -93,7 +105,13 @@ const TableUsersComponent: React.FC<TableUsers<IUser>> = (props: TableUsers<IUse
     {
       title: "operation",
       dataIndex: "operation",
-      render: (_, record: {id: number}) => (props.dataUser.length >= 1 ? <PopConfirmDelete keyUser={record.id} handleDetete={handleDeleteOneUser} /> : null),
+      render: (_, record: IUser) =>
+        props.dataUser.length >= 1 ? (
+          <>
+            <PopConfirmDelete keyUser={record.id} handleDetete={handleDeleteOneUser} />
+            <EditButton user={record} handleUpdateUser={props.handleUpdateUser} />
+          </>
+        ) : null,
     },
   ]
 

@@ -10,3 +10,14 @@ export function useDeleteUser() {
     },
   })
 }
+
+export function useAddUser(cb: () => void) {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (user: any) => userApiService.addUser(user),
+    onSuccess: () => {
+      cb()
+      queryClient.invalidateQueries("users")
+    },
+  })
+}
