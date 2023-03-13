@@ -5,7 +5,7 @@ import reportWebVitals from "./reportWebVitals"
 import router from "./router"
 import {RouterProvider} from "react-router-dom"
 import "antd/dist/reset.css"
-import {QueryClient, QueryClientProvider, useQuery} from "react-query"
+import {QueryClient, QueryClientProvider} from "react-query"
 
 const queryClient = new QueryClient()
 const root = ReactDOM.createRoot(document.getElementById("root") as HTMLElement)

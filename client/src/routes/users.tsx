@@ -6,21 +6,17 @@ import useDebounce from "../hook/useDebounce"
 import usePagination from "../hook/usePagination"
 import {useUsersLists} from "../hook/useUsersList"
 import {useSearchParams} from "react-router-dom"
+import {useDeleteUser} from "../hook/useUsersAction"
 const Users: React.FC = () => {
-  const [dataUser, setData] = useState<IUser[]>([])
   const [dataUserWillBeRemove, setDataUserWillBeRemove] = useState<IUser[]>([])
   const {q: querySearch, page, pageSize} = usePagination()
   const inputSearch = useDebounce(querySearch, 400)
   const {isLoading, data} = useUsersLists(inputSearch, Number(page), Number(pageSize))
   const [searchParams, setSearchParams] = useSearchParams()
-  const handleDeleteOneUser = useCallback(
-    (key: React.Key) => {
-      // const tmpData: DataTypeUser[] = dataUser.filter((item) => item.key !== key)
-      // setData(tmpData)
-    },
-    [setData]
-  )
-
+  const mutationDeleteUser = useDeleteUser()
+  const handleDeleteOneUser = useCallback((key: number) => {
+    mutationDeleteUser.mutate(key)
+  }, [])
   const getUserWillBeRemove = useCallback(
     (data: IUser[]) => {
       setDataUserWillBeRemove(data)
@@ -28,10 +24,9 @@ const Users: React.FC = () => {
     [setDataUserWillBeRemove]
   )
   const deleteMultipleUsers = () => {
-    // const listKeyUserDeleted = dataUserWillBeRemove.map((item) => item.key)
-    // const newUsersList: DataTypeUser[] = dataUser.filter((item) => !listKeyUserDeleted.includes(item.key))
-    // setData(newUsersList)
-    // setDataUserWillBeRemove([])
+    const listKeyDeleted = dataUserWillBeRemove.map((user) => user.id)
+    mutationDeleteUser.mutate(listKeyDeleted)
+    setDataUserWillBeRemove([])
   }
 
   const confirm = useCallback(() => {
@@ -49,14 +44,13 @@ const Users: React.FC = () => {
 
   const handleSearch = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>): void => {
-      searchParams.set("keyword", e.target.value)
+      searchParams.set("keyword", e.target.value.trim())
       searchParams.delete("page")
       searchParams.delete("pageSize")
       setSearchParams(searchParams)
     },
     [searchParams, setSearchParams]
   )
-
   return (
     <div>
       <h1>Users list</h1>
@@ -71,6 +65,7 @@ const Users: React.FC = () => {
           </Button>
         </Popconfirm>
       </div>
+      {mutationDeleteUser.isLoading && <span>Deleting ........</span>}
       <TableUsers
         dataUser={data?.data}
         handleDeleteOneUser={handleDeleteOneUser}

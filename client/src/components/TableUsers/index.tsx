@@ -12,7 +12,7 @@ export interface TableUsers<T> {
   dataUser: T[] | []
   loading: boolean
   total: number
-  handleDeleteOneUser: (key: React.Key) => void
+  handleDeleteOneUser: (key: number) => void
   getUsersWillBeRemove: (data: IUser[]) => void
 }
 
@@ -20,7 +20,7 @@ const onChange = (e: CheckboxChangeEvent, key: React.Key) => {
   console.log(`checked = ${e.target.checked} at ${key}`)
 }
 
-const PopConfirmDelete = memo(({keyUser, handleDetete}: {keyUser: React.Key; handleDetete: (key: React.Key) => void}) => {
+const PopConfirmDelete = memo(({keyUser, handleDetete}: {keyUser: number; handleDetete: (key: number) => void}) => {
   const deleteOneUser = useCallback(() => {
     handleDetete(keyUser)
   }, [keyUser, handleDetete])
@@ -80,10 +80,6 @@ const TableUsersComponent: React.FC<TableUsers<IUser>> = (props: TableUsers<IUse
       dataIndex: "lastName",
     },
     {
-      title: "First Name",
-      dataIndex: "firstName",
-    },
-    {
       title: "Date of birth",
       dataIndex: "dob",
     },
@@ -97,7 +93,7 @@ const TableUsersComponent: React.FC<TableUsers<IUser>> = (props: TableUsers<IUse
     {
       title: "operation",
       dataIndex: "operation",
-      render: (_, record: {id: React.Key}) => (props.dataUser.length >= 1 ? <PopConfirmDelete keyUser={record.id} handleDetete={handleDeleteOneUser} /> : null),
+      render: (_, record: {id: number}) => (props.dataUser.length >= 1 ? <PopConfirmDelete keyUser={record.id} handleDetete={handleDeleteOneUser} /> : null),
     },
   ]
 
@@ -108,20 +104,17 @@ const TableUsersComponent: React.FC<TableUsers<IUser>> = (props: TableUsers<IUse
     },
   }
 
-  const handlePageSizeChange = useCallback(
-    (current: number, size: number) => {
-      searchParams.set("pageSize", String(size))
-      setSearchParams(searchParams)
-    },
-    [searchParams, setSearchParams]
-  )
-
   const handlePageChange = useCallback(
-    (pageChoosen: number) => {
+    (page: number, pageSize: number) => {
       if (searchParams.has("page")) {
-        searchParams.set("page", String(pageChoosen))
+        searchParams.set("page", String(page))
       } else {
-        searchParams.append("page", String(pageChoosen))
+        searchParams.append("page", String(page))
+      }
+      if (searchParams.has("pageSize")) {
+        searchParams.set("pageSize", String(pageSize))
+      } else {
+        searchParams.append("pageSize", String(pageSize))
       }
       setSearchParams(searchParams)
     },
@@ -136,6 +129,7 @@ const TableUsersComponent: React.FC<TableUsers<IUser>> = (props: TableUsers<IUse
         rowSelection={{
           type: "checkbox",
           ...rowSelection,
+          preserveSelectedRowKeys: true,
         }}
         columns={columns}
         dataSource={props.dataUser}
@@ -143,13 +137,7 @@ const TableUsersComponent: React.FC<TableUsers<IUser>> = (props: TableUsers<IUse
         loading={props.loading}
         rowKey={getKey}
       />
-      <PaginationComponent
-        handlePageChange={handlePageChange}
-        onPageSizeChange={handlePageSizeChange}
-        pageSize={pageSizeCurrent}
-        current={current}
-        total={props.total}
-      />
+      <PaginationComponent handlePageChange={handlePageChange} pageSize={pageSizeCurrent} current={current} total={props.total} />
     </div>
   )
 }

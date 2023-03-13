@@ -4,30 +4,16 @@ interface IPagination {
   total: number
   current: number
   pageSize: number
-  handlePageChange: (page: number) => void
-  onPageSizeChange: (current: number, size: number) => void
+  handlePageChange: (page: number, pageSize: number) => void
 }
 const PaginationComponent: React.FC<IPagination> = (props: IPagination) => {
-  const handlePageSizeChange = useCallback((current: number, size: number) => {
-    props.onPageSizeChange(current, size)
-  }, [])
-
   const onChange = useCallback(
-    (page: number) => {
-      props.handlePageChange(page)
+    (page: number, pageSize: number) => {
+      props.handlePageChange(page, pageSize)
     },
     [props.handlePageChange]
   )
-  return (
-    <Pagination
-      current={props.current}
-      defaultPageSize={10}
-      total={props.total}
-      pageSize={props.pageSize}
-      onShowSizeChange={handlePageSizeChange}
-      onChange={onChange}
-    />
-  )
+  return <Pagination current={props.current} defaultPageSize={10} total={props.total} pageSize={props.pageSize} onChange={onChange} />
 }
 
 export default PaginationComponent
