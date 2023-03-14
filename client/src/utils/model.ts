@@ -12,3 +12,12 @@ export interface IUser {
   fullName: string
   age: number | null
 }
+
+export interface IUserAction {
+  username: string
+  password: string
+  email: string
+  firstName: string
+  lastName: string
+  dob: string
+}

@@ -1,5 +1,5 @@
-import {useMutation, useQueryClient} from "react-query"
-
+import {useMutation, useQueryClient, useQuery} from "react-query"
+import {IUserAction} from "../utils/model"
 import userApiService from "../apis/usersApiServices"
 export function useDeleteUser() {
   const queryClient = useQueryClient()
@@ -14,7 +14,26 @@ export function useDeleteUser() {
 export function useAddUser(cb: () => void) {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: (user: any) => userApiService.addUser(user),
+    mutationFn: (user: IUserAction) => userApiService.addUser(user),
+    onSuccess: () => {
+      cb()
+      queryClient.invalidateQueries("users")
+    },
+  })
+}
+
+export function useGetUserById(id: number) {
+  return useQuery({
+    queryKey: ["user", id],
+    queryFn: () => userApiService.getUserById(id),
+    refetchInterval: false,
+  })
+}
+
+export function useUpdateUser(cb: () => void) {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (user: Partial<IUserAction & {id: number}>) => userApiService.updateUser(user),
     onSuccess: () => {
       cb()
       queryClient.invalidateQueries("users")

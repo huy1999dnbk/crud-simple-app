@@ -1,6 +1,6 @@
 import React, {useState, useMemo, useCallback} from "react"
 import TableUsers from "../components/TableUsers"
-import {IUser} from "../utils/model"
+import {IUser, IUserAction} from "../utils/model"
 import {Button, message, Popconfirm, Modal, Form} from "antd"
 import useDebounce from "../hook/useDebounce"
 import usePagination from "../hook/usePagination"
@@ -9,6 +9,8 @@ import {useSearchParams} from "react-router-dom"
 import {useDeleteUser, useAddUser} from "../hook/useUsersAction"
 import AddUser from "../components/AddUser/AddUser"
 import EditUser from "../components/EditUser/EditUser"
+import type {FormInstance} from "antd/es/form"
+import {useUpdateUser} from "../hook/useUsersAction"
 const Users: React.FC = () => {
   const [dataUserWillBeRemove, setDataUserWillBeRemove] = useState<IUser[]>([])
   const [modalOpen, setModalOpen] = useState<boolean>(false)
@@ -18,8 +20,10 @@ const Users: React.FC = () => {
   const {isLoading, data} = useUsersLists(inputSearch, Number(page), Number(pageSize))
   const [searchParams, setSearchParams] = useSearchParams()
   const mutationDeleteUser = useDeleteUser()
+  const mutationUpdateUser = useUpdateUser(() => setModalOpen(false))
   const mutationAddUser = useAddUser(() => setModalOpen(false))
-
+  const formRef = React.useRef<FormInstance>(null)
+  const [idUserUpdated, setIdUserUpdated] = useState<number>(0)
   const handleDeleteOneUser = useCallback((key: number) => {
     mutationDeleteUser.mutate(key)
   }, [])
@@ -65,6 +69,7 @@ const Users: React.FC = () => {
 
   const closeModal = useCallback(() => {
     if (window.confirm("All data you edited will be lost")) {
+      formRef.current?.resetFields()
       setModalOpen(false)
     }
     return
@@ -72,12 +77,19 @@ const Users: React.FC = () => {
 
   const titleModal = useMemo(() => (typeActionUser === "Add" ? "Add user" : typeActionUser === "Edit" ? "Edit User" : null), [typeActionUser])
   const handleUpdateUser = useCallback((user: IUser) => {
+    setIdUserUpdated(user.id)
     setModalOpen(true)
     setTypeActionUser("Edit")
   }, [])
-
-  const addUser = useCallback((user: any) => {
-    mutationAddUser.mutate(user)
+  console.log("typeActionUser", typeActionUser)
+  const onSubmit = useCallback((user: IUserAction) => {
+    if (typeActionUser === "Add") {
+      mutationAddUser.mutate(user)
+    }
+    if (typeActionUser === "Edit") {
+      console.log("dsadasdsad")
+      // mutationUpdateUser.mutate(userEditInfo)
+    }
   }, [])
 
   return (
@@ -117,7 +129,11 @@ const Users: React.FC = () => {
           </Button>,
         ]}
       >
-        {typeActionUser === "Add" ? <AddUser onSubmit={addUser} /> : typeActionUser === "Edit" ? <EditUser /> : null}
+        {typeActionUser === "Add" ? (
+          <AddUser onSubmit={onSubmit} formRef={formRef} />
+        ) : typeActionUser === "Edit" ? (
+          <EditUser idUserUpdated={idUserUpdated} formRef={formRef} onSubmit={onSubmit} />
+        ) : null}
       </Modal>
     </div>
   )

@@ -1,18 +1,36 @@
-import React, {useCallback} from "react"
+import React, {useCallback, useEffect} from "react"
 import {Form, Input, DatePicker} from "antd"
+import type {FormInstance} from "antd/es/form"
+import {IUserAction} from "../../utils/model"
 import dayjs from "dayjs"
 interface IFormData {
-  onSubmit: (data: any) => void
+  onSubmit: (data: IUserAction) => void
+  formRef: React.RefObject<FormInstance>
+  defaultDataForm?: IUserAction
 }
 const FormData: React.FC<IFormData> = (props: IFormData) => {
-  const onFinish = useCallback((values: any) => {
+  const {defaultDataForm} = props
+  const onFinish = useCallback((values: IUserAction) => {
     values.dob = dayjs(values.dob).toISOString()
+    console.log(values)
     props.onSubmit(values)
   }, [])
 
   const onFinishFailed = useCallback((errorInfo: any) => {
     console.log("Failed:", errorInfo)
   }, [])
+
+  useEffect(() => {
+    if (defaultDataForm) {
+      props.formRef.current?.setFieldsValue({
+        username: defaultDataForm?.username,
+        email: defaultDataForm?.email,
+        firstName: defaultDataForm?.firstName,
+        lastName: defaultDataForm?.lastName,
+        dob: dayjs(defaultDataForm?.dob),
+      })
+    }
+  }, [defaultDataForm])
 
   return (
     <div>
@@ -21,18 +39,29 @@ const FormData: React.FC<IFormData> = (props: IFormData) => {
         labelCol={{span: 8}}
         wrapperCol={{span: 16}}
         style={{maxWidth: 600}}
-        initialValues={{remember: true}}
         onFinish={onFinish}
         onFinishFailed={onFinishFailed}
         autoComplete="off"
         id="form-action"
+        ref={props.formRef}
+        initialValues={{
+          remember: true,
+        }}
       >
         <Form.Item label="Username" name="username" rules={[{required: true, message: "Please input your username!"}]}>
           <Input />
         </Form.Item>
 
-        <Form.Item label="Password" name="password" rules={[{required: true, message: "Please input your password!"}]}>
-          <Input.Password />
+        <Form.Item
+          label="Password"
+          name="password"
+          rules={[
+            {
+              validator: (_, value) => (defaultDataForm || (value && !defaultDataForm) ? Promise.resolve() : Promise.reject(new Error("invalid password"))),
+            },
+          ]}
+        >
+          <Input.Password disabled={defaultDataForm ? true : false} />
         </Form.Item>
 
         <Form.Item label="Email" name="email" rules={[{required: true, message: "Please input your email!", type: "email"}]}>
