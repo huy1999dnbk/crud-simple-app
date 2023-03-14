@@ -5,14 +5,13 @@ import {IUserAction} from "../../utils/model"
 import dayjs from "dayjs"
 interface IFormData {
   onSubmit: (data: IUserAction) => void
-  formRef: React.RefObject<FormInstance>
   defaultDataForm?: IUserAction
 }
 const FormData: React.FC<IFormData> = (props: IFormData) => {
   const {defaultDataForm} = props
+  const formRef = React.useRef<FormInstance>(null)
   const onFinish = useCallback((values: IUserAction) => {
     values.dob = dayjs(values.dob).toISOString()
-    console.log(values)
     props.onSubmit(values)
   }, [])
 
@@ -22,7 +21,7 @@ const FormData: React.FC<IFormData> = (props: IFormData) => {
 
   useEffect(() => {
     if (defaultDataForm) {
-      props.formRef.current?.setFieldsValue({
+      formRef.current?.setFieldsValue({
         username: defaultDataForm?.username,
         email: defaultDataForm?.email,
         firstName: defaultDataForm?.firstName,
@@ -43,10 +42,7 @@ const FormData: React.FC<IFormData> = (props: IFormData) => {
         onFinishFailed={onFinishFailed}
         autoComplete="off"
         id="form-action"
-        ref={props.formRef}
-        initialValues={{
-          remember: true,
-        }}
+        ref={formRef}
       >
         <Form.Item label="Username" name="username" rules={[{required: true, message: "Please input your username!"}]}>
           <Input />

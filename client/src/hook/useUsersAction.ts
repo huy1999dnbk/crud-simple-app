@@ -26,7 +26,6 @@ export function useGetUserById(id: number) {
   return useQuery({
     queryKey: ["user", id],
     queryFn: () => userApiService.getUserById(id),
-    refetchInterval: false,
   })
 }
 

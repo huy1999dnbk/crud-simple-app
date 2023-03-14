@@ -1,4 +1,4 @@
-import React, {useState, useMemo, useCallback} from "react"
+import React, {useState, useMemo, useCallback, useEffect} from "react"
 import TableUsers from "../components/TableUsers"
 import {IUser, IUserAction} from "../utils/model"
 import {Button, message, Popconfirm, Modal, Form} from "antd"
@@ -9,7 +9,6 @@ import {useSearchParams} from "react-router-dom"
 import {useDeleteUser, useAddUser} from "../hook/useUsersAction"
 import AddUser from "../components/AddUser/AddUser"
 import EditUser from "../components/EditUser/EditUser"
-import type {FormInstance} from "antd/es/form"
 import {useUpdateUser} from "../hook/useUsersAction"
 const Users: React.FC = () => {
   const [dataUserWillBeRemove, setDataUserWillBeRemove] = useState<IUser[]>([])
@@ -22,8 +21,8 @@ const Users: React.FC = () => {
   const mutationDeleteUser = useDeleteUser()
   const mutationUpdateUser = useUpdateUser(() => setModalOpen(false))
   const mutationAddUser = useAddUser(() => setModalOpen(false))
-  const formRef = React.useRef<FormInstance>(null)
   const [idUserUpdated, setIdUserUpdated] = useState<number>(0)
+  const [editUser, setEditUser] = useState<boolean>(false)
   const handleDeleteOneUser = useCallback((key: number) => {
     mutationDeleteUser.mutate(key)
   }, [])
@@ -68,29 +67,48 @@ const Users: React.FC = () => {
   }, [typeActionUser])
 
   const closeModal = useCallback(() => {
-    if (window.confirm("All data you edited will be lost")) {
-      formRef.current?.resetFields()
-      setModalOpen(false)
-    }
-    return
-  }, [])
+    setModalOpen(false)
+    setTypeActionUser("")
+  }, [idUserUpdated])
 
   const titleModal = useMemo(() => (typeActionUser === "Add" ? "Add user" : typeActionUser === "Edit" ? "Edit User" : null), [typeActionUser])
-  const handleUpdateUser = useCallback((user: IUser) => {
-    setIdUserUpdated(user.id)
-    setModalOpen(true)
-    setTypeActionUser("Edit")
-  }, [])
-  console.log("typeActionUser", typeActionUser)
-  const onSubmit = useCallback((user: IUserAction) => {
-    if (typeActionUser === "Add") {
-      mutationAddUser.mutate(user)
+  const handleUpdateUser = useCallback(
+    (id: number) => {
+      setIdUserUpdated(id)
+      setModalOpen(true)
+      setTypeActionUser("Edit")
+    },
+    [idUserUpdated, typeActionUser, setIdUserUpdated]
+  )
+
+  const onSubmit = useCallback(
+    (user: IUserAction) => {
+      if (typeActionUser === "Add") {
+        mutationAddUser.mutate(user)
+      }
+      if (typeActionUser === "Edit") {
+        console.log(user)
+      }
+    },
+    [typeActionUser, setIdUserUpdated, idUserUpdated]
+  )
+
+  useEffect(() => {
+    const handleTabClose = (event: any) => {
+      event.preventDefault()
+
+      console.log("beforeunload event triggered")
+
+      return (event.returnValue = "Are you sure you want to exit?")
     }
-    if (typeActionUser === "Edit") {
-      console.log("dsadasdsad")
-      // mutationUpdateUser.mutate(userEditInfo)
+    if (modalOpen) {
+      window.addEventListener("beforeunload", handleTabClose)
+
+      return () => {
+        window.removeEventListener("beforeunload", handleTabClose)
+      }
     }
-  }, [])
+  }, [modalOpen])
 
   return (
     <div>
@@ -124,15 +142,15 @@ const Users: React.FC = () => {
         open={modalOpen}
         onCancel={closeModal}
         footer={[
-          <Button form="form-action" key="submit" htmlType="submit" loading={mutationAddUser.isLoading}>
+          <Button form="form-action" key="submit" htmlType="submit">
             Submit
           </Button>,
         ]}
       >
         {typeActionUser === "Add" ? (
-          <AddUser onSubmit={onSubmit} formRef={formRef} />
+          <AddUser onSubmit={onSubmit} />
         ) : typeActionUser === "Edit" ? (
-          <EditUser idUserUpdated={idUserUpdated} formRef={formRef} onSubmit={onSubmit} />
+          <EditUser idUserUpdated={idUserUpdated} onSubmit={onSubmit} />
         ) : null}
       </Modal>
     </div>

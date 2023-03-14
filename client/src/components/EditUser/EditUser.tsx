@@ -1,12 +1,10 @@
 import React, {useMemo} from "react"
 import FormData from "../FormData"
-import type {FormInstance} from "antd/es/form"
 import {IUserAction} from "../../utils/model"
 import {useGetUserById} from "../../hook/useUsersAction"
 interface IEditUser {
   onSubmit: (data: IUserAction) => void
   idUserUpdated: number
-  formRef: React.RefObject<FormInstance>
 }
 const EditUser: React.FC<IEditUser> = (props: IEditUser) => {
   const {data} = useGetUserById(props.idUserUpdated)
@@ -22,7 +20,7 @@ const EditUser: React.FC<IEditUser> = (props: IEditUser) => {
   }, [data])
   return (
     <div>
-      <FormData onSubmit={props.onSubmit} formRef={props.formRef} defaultDataForm={defaultDataForm} />
+      <FormData onSubmit={props.onSubmit} defaultDataForm={defaultDataForm} />
     </div>
   )
 }

@@ -1,4 +1,4 @@
-import React, {memo, useCallback, useMemo} from "react"
+import React, {memo, useCallback, useMemo, Dispatch} from "react"
 import {Table, Button} from "antd"
 import type {ColumnsType} from "antd/es/table"
 import {IUser} from "../../utils/model"
@@ -13,7 +13,7 @@ export interface TableUsers<T> {
   loading: boolean
   total: number
   handleDeleteOneUser: (key: number) => void
-  handleUpdateUser: (user: IUser) => void
+  handleUpdateUser: (id: number) => void
   getUsersWillBeRemove: (data: IUser[]) => void
 }
 
@@ -52,10 +52,10 @@ const CheckBoxUser = memo(
   }
 )
 
-const EditButton = memo(({user, handleUpdateUser}: {user: IUser; handleUpdateUser: (user: IUser) => void}) => {
+const EditButton = memo(({id, handleUpdateUser}: {id: number; handleUpdateUser: (id: number) => void}) => {
   const updateUser = useCallback(() => {
-    handleUpdateUser(user)
-  }, [])
+    handleUpdateUser(id)
+  }, [handleUpdateUser, id])
   return (
     <Button type="default" onClick={updateUser}>
       Edit
@@ -99,7 +99,7 @@ const TableUsersComponent: React.FC<TableUsers<IUser>> = (props: TableUsers<IUse
       title: "Active",
       dataIndex: "isActive",
       render: (isActive: boolean, record: IUser) => {
-        return <CheckBoxUser keyUser={record.id} defaultChecked={isActive} onChangeActive={onChange} />
+        return <CheckBoxUser key={record.id} keyUser={record.id} defaultChecked={isActive} onChangeActive={onChange} />
       },
     },
     {
@@ -107,10 +107,10 @@ const TableUsersComponent: React.FC<TableUsers<IUser>> = (props: TableUsers<IUse
       dataIndex: "operation",
       render: (_, record: IUser) =>
         props.dataUser.length >= 1 ? (
-          <>
+          <div key={record.id}>
             <PopConfirmDelete keyUser={record.id} handleDetete={handleDeleteOneUser} />
-            <EditButton user={record} handleUpdateUser={props.handleUpdateUser} />
-          </>
+            <EditButton key={record.id} id={record.id} handleUpdateUser={props.handleUpdateUser} />
+          </div>
         ) : null,
     },
   ]
