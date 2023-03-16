@@ -93,7 +93,11 @@ const TableUsersComponent: React.FC<TableUsers<IUser>> = (props: TableUsers<IUse
       title: "Username",
       dataIndex: "username",
       sortDirections: ["ascend", "descend"],
-      sorter: (_, _1, order): any => console.log(typeof order),
+      sortOrder: "ascend",
+      sorter: (_, _1, order): any => {
+        console.log("sort", order)
+        return 2
+      },
     },
     {
       title: "Email",

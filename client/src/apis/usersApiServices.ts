@@ -43,6 +43,7 @@ class UserApiServices {
         lastName: userInfo.lastName,
         dob: userInfo.dob,
         id: userInfo.id,
+        firstName: userInfo.firstName,
       })
       .then((response) => {
         return response.data
