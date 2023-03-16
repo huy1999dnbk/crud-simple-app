@@ -3,8 +3,10 @@ import axios from "axios"
 import {IUserAction} from "../utils/model"
 class UserApiServices {
   constructor(private readonly url: string = API_URL.dn0_url) {}
-  getUsers(keyword: string, page: number, pageSize: number) {
-    return axios.get(`${this.url}/users?take=${pageSize}&page=${page}&keyword=${keyword}`).then((response) => response.data)
+  getUsers(keyword: string, page: number, pageSize: number, usernameSort: string) {
+    return axios
+      .get(`${this.url}/users?take=${pageSize}&page=${page}&keyword=${keyword}&sorts[1].[field]=username&sorts[1].[direction]=${usernameSort}`)
+      .then((response) => response.data)
   }
   deleteUser(args: number | number[]) {
     return axios

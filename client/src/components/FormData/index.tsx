@@ -1,14 +1,15 @@
 import React, {useCallback, useEffect} from "react"
-import {Form, Input, DatePicker} from "antd"
+import {Form, Input, DatePicker, Button} from "antd"
 import type {FormInstance} from "antd/es/form"
 import {IUserAction} from "../../utils/model"
 import dayjs from "dayjs"
 interface IFormData {
   onSubmit: (data: IUserAction) => void
   defaultDataForm?: IUserAction
+  loadingButtonSubmit: boolean
 }
 const FormData: React.FC<IFormData> = (props: IFormData) => {
-  const {defaultDataForm} = props
+  const {defaultDataForm, loadingButtonSubmit} = props
   const formRef = React.useRef<FormInstance>(null)
   const onFinish = useCallback((values: IUserAction) => {
     values.dob = dayjs(values.dob).toISOString()
@@ -18,7 +19,6 @@ const FormData: React.FC<IFormData> = (props: IFormData) => {
   const onFinishFailed = useCallback((errorInfo: any) => {
     console.log("Failed:", errorInfo)
   }, [])
-
   useEffect(() => {
     if (defaultDataForm) {
       formRef.current?.setFieldsValue({
@@ -75,6 +75,9 @@ const FormData: React.FC<IFormData> = (props: IFormData) => {
         <Form.Item label="Date of birth" name="dob" rules={[{required: true, message: "Please input your last dob!"}]}>
           <DatePicker format="YYYY-MM-DD HH:mm:ss" showTime={{defaultValue: dayjs("00:00:00", "HH:mm:ss")}} />
         </Form.Item>
+        <Button htmlType="submit" form="form-action" loading={loadingButtonSubmit}>
+          Submit
+        </Button>
       </Form>
     </div>
   )

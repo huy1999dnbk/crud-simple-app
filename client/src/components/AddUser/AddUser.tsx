@@ -1,13 +1,18 @@
-import React from "react"
+import React, {Dispatch, useCallback} from "react"
 import FormData from "../FormData"
-import type {FormInstance} from "antd/es/form"
+import {IUserAction} from "../../utils/model"
+import {useAddUser} from "../../hook/useUsersAction"
 interface IAddUser {
-  onSubmit: (data: any) => void
+  setAddUserModalOpen: Dispatch<boolean>
 }
 const AddUser: React.FC<IAddUser> = (props: IAddUser) => {
+  const mutationAddUser = useAddUser(() => props.setAddUserModalOpen(false))
+  const onSubmit = useCallback((user: IUserAction) => {
+    mutationAddUser.mutate(user)
+  }, [])
   return (
     <div>
-      <FormData onSubmit={props.onSubmit} />
+      <FormData onSubmit={onSubmit} loadingButtonSubmit={mutationAddUser.isLoading} />
     </div>
   )
 }

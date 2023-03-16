@@ -7,6 +7,7 @@ const usePagination = () => {
     q: searchParams.get("keyword") || "",
     page: searchParams.get("page") || 1,
     pageSize: searchParams.get("pageSize") || 10,
+    usernameSort: searchParams.get("username") || "asc",
   }
 }
 

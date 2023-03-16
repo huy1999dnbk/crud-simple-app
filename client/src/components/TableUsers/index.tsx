@@ -1,4 +1,4 @@
-import React, {memo, useCallback, useMemo, Dispatch} from "react"
+import React, {memo, useCallback, useMemo, useState, useEffect} from "react"
 import {Table, Button} from "antd"
 import type {ColumnsType} from "antd/es/table"
 import {IUser} from "../../utils/model"
@@ -7,7 +7,8 @@ import type {CheckboxChangeEvent} from "antd/es/checkbox"
 import PaginationComponent from "../Pagination"
 import {useSearchParams} from "react-router-dom"
 import usePagination from "../../hook/usePagination"
-
+import {SortOrder} from "antd/es/table/interface"
+import {debounce} from "../../utils/helpers"
 export interface TableUsers<T> {
   dataUser: T[] | []
   loading: boolean
@@ -66,9 +67,22 @@ const EditButton = memo(({id, handleUpdateUser}: {id: number; handleUpdateUser: 
 const TableUsersComponent: React.FC<TableUsers<IUser>> = (props: TableUsers<IUser>) => {
   const {handleDeleteOneUser, getUsersWillBeRemove} = props
   const [searchParams, setSearchParams] = useSearchParams()
-  const {pageSize, page} = usePagination()
+  const {pageSize, page, usernameSort} = usePagination()
   const pageSizeCurrent = useMemo(() => Number(pageSize), [pageSize])
   const current = useMemo(() => Number(page), [page])
+  const sortUrl: SortOrder = useMemo(() => (usernameSort === "asc" ? "ascend" : "descend"), [])
+  const pushSortPropToUrl = useCallback(
+    (field: string, order: SortOrder | undefined) => {
+      const sortOrder = order === "descend" ? "desc" : "asc"
+      if (searchParams.has(`${field}`)) {
+        searchParams.set(`${field}`, sortOrder)
+      } else {
+        searchParams.append(`${field}`, sortOrder)
+      }
+      setSearchParams(searchParams)
+    },
+    [setSearchParams, searchParams]
+  )
   const columns: ColumnsType<IUser> = [
     {
       title: "No.",
@@ -78,6 +92,8 @@ const TableUsersComponent: React.FC<TableUsers<IUser>> = (props: TableUsers<IUse
     {
       title: "Username",
       dataIndex: "username",
+      sortDirections: ["ascend", "descend"],
+      sorter: (_, _1, order): any => console.log(typeof order),
     },
     {
       title: "Email",
@@ -124,6 +140,7 @@ const TableUsersComponent: React.FC<TableUsers<IUser>> = (props: TableUsers<IUse
 
   const handlePageChange = useCallback(
     (page: number, pageSize: number) => {
+      console.log(1)
       if (searchParams.has("page")) {
         searchParams.set("page", String(page))
       } else {
